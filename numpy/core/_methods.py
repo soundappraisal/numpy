@@ -151,7 +151,7 @@ def _mean_var(a, axis=None, dtype=None, mean_out=None, var_out=None, ddof=0, kee
     # not be either.
 
     if mean_out is not None:
-        broadcast_shape = asanyarray(a.shape, dtype=int)
+        broadcast_shape = asanyarray(arr.shape, dtype=int)
         if axis is not None:
             broadcast_shape[axis] = 1
         else:
@@ -161,7 +161,7 @@ def _mean_var(a, axis=None, dtype=None, mean_out=None, var_out=None, ddof=0, kee
         mean_shape = mean_out.shape
         mean_out.resize(broadcast_shape)
 
-    ret_mean = umr_sum(arr, axis, dtype, mean_out, keepdims=True, where=where)  #
+    ret_mean = umr_sum(arr, axis, dtype, mean_out, keepdims=True, where=where)
 
     # The shape of rcount has to match ret_mean to not change the shape of out
     # in broadcasting. Otherwise, it cannot be stored back to ret_mean.
