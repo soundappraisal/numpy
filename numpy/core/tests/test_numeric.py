@@ -366,7 +366,6 @@ class TestNonarrayArgs:
         assert mean_out is mean
         assert var_out is var
 
-
     def test_mean_var_keepdims_true(self):
         rng = np.random.RandomState(1234)
         A = rng.randn(10, 20,5)+0.5
@@ -384,6 +383,22 @@ class TestNonarrayArgs:
         assert_equal(np.array(var_old.shape), np.array(mean_old.shape))
         assert_equal(var, var_old)
 
+    def test_mean_var_multiple_axis(self):
+        rng = np.random.RandomState(1234)
+        A = rng.randn(10, 20,5)+0.5
+        axis=(0,2)
+        mean, var = np.mean_var(A, mean_out=None, var_out=None, axis=axis, keepdims=False)
+
+        # Shape of returned mean and var should be same
+        assert_equal(np.array(var.shape), np.array(mean.shape))
+        assert_equal(np.array(var.shape), np.array([20]))
+
+        # Output should be the same as from the individual algorithms
+        var_old = np.var(A,axis=axis)
+        mean_old = np.mean(A,axis=axis)
+
+        assert_equal(np.array(var_old.shape), np.array(mean_old.shape))
+        assert_equal(var, var_old)
 
 class TestIsscalar:
     def test_isscalar(self):

@@ -3440,7 +3440,7 @@ def mean(a, axis=None, dtype=None, out=None, keepdims=np._NoValue, *,
     See Also
     --------
     average : Weighted average
-    std, var, nanmean, nanstd, nanvar
+    std, mean_std, mean_var, var, nanmean, nanstd, nanvar
 
     Notes
     -----
@@ -3569,7 +3569,7 @@ def std(a, axis=None, dtype=None, out=None, ddof=0, keepdims=np._NoValue, *,
 
     See Also
     --------
-    var, mean, nanmean, nanstd, nanvar
+    var, mean, mean_std, mean_var, nanmean, nanstd, nanvar
     :ref:`ufuncs-output-type`
 
     Notes
@@ -3721,7 +3721,7 @@ def mean_std(a, axis=None, dtype=None, mean_out=None, std_out=None, ddof=0, keep
 
     See Also
     --------
-    var, std, mean, nanmean, nanstd, nanvar
+    var, std, mean, mean_var, nanmean, nanstd, nanvar
     :ref:`ufuncs-output-type`
 
     Notes
@@ -3770,21 +3770,21 @@ def mean_var(a, axis=None, dtype=None, mean_out=None, var_out=None, ddof=0, keep
     """
     Compute the mean and the variance along the specified axis.
 
-    Returns the mean and the standard deviation, a measure of the spread of a distribution,
-    of the array elements. The standard deviation is computed for the
+    Returns the mean and the variance, a measure of the spread of a distribution,
+    of the array elements. The variance is computed for the
     flattened array by default, otherwise over the specified axis.
 
     Parameters
     ----------
     a : array_like
-        Calculate the standard deviation of these values.
+        Calculate the variance of these values.
     axis : None or int or tuple of ints, optional
-        Axis or axes along which the standard deviation is computed. The
-        default is to compute the standard deviation of the flattened array.
+        Axis or axes along which the variance is computed. The
+        default is to compute the variance of the flattened array.
 
         .. versionadded:: 1.7.0
 
-        If this is a tuple of ints, a standard deviation is performed over
+        If this is a tuple of ints, a variance is performed over
         multiple axes, instead of a single axis or all the axes as before.
     dtype : dtype, optional
         Type to use in computing the standard deviation. For arrays of
@@ -3814,7 +3814,7 @@ def mean_var(a, axis=None, dtype=None, mean_out=None, var_out=None, ddof=0, keep
         exceptions will be raised.
 
     where : array_like of bool, optional
-        Elements to include in the standard deviation.
+        Elements to include in the variance.
         See `~numpy.ufunc.reduce` for details.
 
         .. version added:: 1.24.1
@@ -3833,25 +3833,25 @@ def mean_var(a, axis=None, dtype=None, mean_out=None, var_out=None, ddof=0, keep
 
     See Also
     --------
-    var, mean_std, std, mean, nanmean, nanstd, nanvar, mean_std
+    var, mean_std, std, mean, nanmean, nanstd, nanvar
     :ref:`ufuncs-output-type`
 
     Notes
     -----
-    Calculation of the mean and the standard deviation is in line with
+    Calculation of the mean and the variance is in line with
      the function mean and var. The notes there explain their definitions.
 
     Examples
     --------
     >>> a = np.array([[1, 2], [3, 4]])
-    >>> np.mean_std(a)
-    (2.5, 1.118033988749895)
+    >>> np.mean_var(a)
+    (2.5, 1.25)
     >>> a = np.array([[1, 2], [3, 4]])
-    >>> np.mean_std(a, axis=0)
+    >>> np.mean_var(a, axis=0)
     (array([2., 3.]), array([1., 1.]))
     >>> a = np.array([[1, 2], [3, 4]])
-    >>> np.mean_std(a, axis=1)
-    (array([1.5, 3.5]), array([0.5, 0.5]))
+    >>> np.mean_var(a, axis=1)
+    (array([1.5, 3.5]), array([0.25, 0.25]))
     """
     
     kwargs = {}
@@ -3937,7 +3937,7 @@ def var(a, axis=None, dtype=None, out=None, ddof=0, keepdims=np._NoValue, *,
 
     See Also
     --------
-    std, mean, nanmean, nanstd, nanvar
+    std, mean, mean_std, mean_var, nanmean, nanstd, nanvar
     :ref:`ufuncs-output-type`
 
     Notes
