@@ -135,7 +135,7 @@ def _mean(a, axis=None, dtype=None, out=None, keepdims=False, *, where=True):
 def _mean_var(a, axis=None, dtype=None, mean_out=None, var_out=None, ddof=0, keepdims=False, *,
          where=True):
     arr = asanyarray(a)
-    
+
     rcount = _count_reduce_items(arr, axis, keepdims=keepdims, where=where)
     # Make this warning show up on top.
     if ddof >= rcount if where is True else umr_any(ddof >= rcount, axis=None):
@@ -149,19 +149,19 @@ def _mean_var(a, axis=None, dtype=None, mean_out=None, var_out=None, ddof=0, kee
     # Compute the mean.
     # Note that if dtype is not of inexact type then arraymean will
     # not be either.
-    
+
     if mean_out is not None:
         broadcast_shape = asanyarray(a.shape, dtype=int)
         if axis is not None:
             broadcast_shape[axis] = 1
         else:
             broadcast_shape[:] = 1
-            
+
         broadcast_shape = tuple(broadcast_shape)
         mean_shape = mean_out.shape
         mean_out.resize(broadcast_shape)
-                
-    ret_mean = umr_sum(arr, axis, dtype, mean_out, keepdims=True, where=where)  # 
+
+    ret_mean = umr_sum(arr, axis, dtype, mean_out, keepdims=True, where=where)  #
 
     # The shape of rcount has to match ret_mean to not change the shape of out
     # in broadcasting. Otherwise, it cannot be stored back to ret_mean.
@@ -171,7 +171,7 @@ def _mean_var(a, axis=None, dtype=None, mean_out=None, var_out=None, ddof=0, kee
     else:
         # matching rcount to ret_mean when where is specified as array
         div = rcount.reshape(ret_mean.shape)
-        
+
     if isinstance(ret_mean, mu.ndarray):
         with _no_nep50_warning():
             ret_mean = um.true_divide(ret_mean, div, out=ret_mean,
@@ -208,17 +208,29 @@ def _mean_var(a, axis=None, dtype=None, mean_out=None, var_out=None, ddof=0, kee
         with _no_nep50_warning():
             ret_var = um.true_divide(
                     ret_var, rcount, out=ret_var, casting='unsafe', subok=False)
-        ret_mean.resize(ret_var.shape)
+        ret_mean.resize(ret_var.shape)  # Make the mean output follow the var output
     elif hasattr(ret_var, 'dtype'):
         ret_var = ret_var.dtype.type(ret_var / rcount)
-        ret_mean = ret_mean.dtype.type(ret_mean)
+        ret_mean = ret_mean.dtype.type(ret_mean)  # Make the mean output follow the var output
     else:
         ret_var = ret_var / rcount
-        
-    
-    
+
     return ret_mean, ret_var
 
+def _mean_std(a, axis=None, dtype=None, mean_out=None, std_out=None, ddof=0, keepdims=False, *,
+         where=True):
+
+    ret_mean, ret_var = _mean_var(a, axis=axis, dtype=dtype, mean_out=mean_out, var_out=std_out, ddof=ddof,
+               keepdims=keepdims, where=where)
+
+    if isinstance(ret_var, mu.ndarray):
+        ret_var = um.sqrt(ret_var, out=ret_var)
+    elif hasattr(ret_var, 'dtype'):
+        ret_var = ret_var.dtype.type(um.sqrt(ret_var))
+    else:
+        ret_var = um.sqrt(ret_var)
+
+    return ret_mean, ret_var
 
 def _var(a, axis=None, dtype=None, out=None, ddof=0, keepdims=False, *,
          where=True):
@@ -226,7 +238,6 @@ def _var(a, axis=None, dtype=None, out=None, ddof=0, keepdims=False, *,
     ret_mean, ret_var = _mean_var(a, axis=axis, dtype=dtype, mean_out=None, var_out=out, ddof=ddof, keepdims=keepdims, where=where)
 
     return ret_var
-
 
 def _std(a, axis=None, dtype=None, out=None, ddof=0, keepdims=False, *,
          where=True):
@@ -242,20 +253,6 @@ def _std(a, axis=None, dtype=None, out=None, ddof=0, keepdims=False, *,
 
     return ret_var
 
-def _mean_std(a, axis=None, dtype=None, mean_out=None, std_out=None, ddof=0, keepdims=False, *,
-         where=True):
-             
-    ret_mean, ret_var = _mean_var(a, axis=axis, dtype=dtype, mean_out=mean_out, var_out=std_out, ddof=ddof,
-               keepdims=keepdims, where=where)
-
-    if isinstance(ret_var, mu.ndarray):
-        ret_var = um.sqrt(ret_var, out=ret_var)
-    elif hasattr(ret_var, 'dtype'):
-        ret_var = ret_var.dtype.type(um.sqrt(ret_var))
-    else:
-        ret_var = um.sqrt(ret_var)
-
-    return ret_mean, ret_var 
 
 def _ptp(a, axis=None, out=None, keepdims=False):
     return um.subtract(
